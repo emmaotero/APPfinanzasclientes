@@ -257,7 +257,7 @@ def seccion_cartera(cartera_id, cartera_nombre):
 
         tipo_op = st.radio("Tipo de operación", [
             "📥 Carga inicial", "🟢 Compra", "🔴 Venta", "🔄 Renovación (PF / FCI)"
-        ], horizontal=True)
+        ], horizontal=True, key=f"radio_op_{cartera_id}")
 
         st.divider()
 
@@ -348,7 +348,8 @@ def seccion_cartera(cartera_id, cartera_nombre):
                         format_func=lambda x: (
                             lambda r: f"{r.get('nombre', r['ticker'])} · {r['ticker']} · "
                                      f"{r['moneda']} · Cant: {r['cantidad']:,.2f} · PPP: ${r.get('precio_compra',0):,.2f}"
-                        )(opciones_pos[opciones_pos["id"]==x].iloc[0].to_dict())
+                        )(opciones_pos[opciones_pos["id"]==x].iloc[0].to_dict()),
+                        key=f"sel_venta_{cartera_id}"
                     )
                     pos_sel = opciones_pos[opciones_pos["id"]==pos_id].iloc[0]
 
@@ -413,7 +414,8 @@ def seccion_cartera(cartera_id, cartera_nombre):
                     pos_manuales["id"].tolist(),
                     format_func=lambda x: (
                         lambda r: f"{r.get('nombre', r['ticker'])} · {r['moneda']} · Cant: {r['cantidad']:,.2f}"
-                    )(pos_manuales[pos_manuales["id"]==x].iloc[0].to_dict())
+                    )(pos_manuales[pos_manuales["id"]==x].iloc[0].to_dict()),
+                    key=f"sel_renov_{cartera_id}"
                 )
                 with st.form(f"renov_{cartera_id}"):
                     nuevo_precio = st.number_input("Nuevo valor / cuota / precio", min_value=0.0, step=0.01)
