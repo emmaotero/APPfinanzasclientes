@@ -179,7 +179,7 @@ elif pagina == "👥  Clientes":
                                 ui.tabla_posiciones(pos_v)
 
                             with st.popover("Editar perfil de riesgo"):
-                                perfil_data = ui.form_perfil(perfil)
+                                perfil_data = ui.form_perfil(perfil, form_key=f"perfil_{cart['id']}")
                                 if perfil_data:
                                     db.guardar_perfil(
                                         cart["id"],
@@ -197,7 +197,7 @@ elif pagina == "👥  Clientes":
         with st.form("nuevo_cliente"):
             nombre = st.text_input("Nombre completo / Razón social")
             tipo = st.selectbox("Tipo", ["persona", "empresa"])
-            desde = st.date_input("Cliente desde", value=date.today())
+            desde = st.date_input("Cliente desde", value=date.today(), format="DD/MM/YYYY")
             notas = st.text_area("Notas", height=80)
             if st.form_submit_button("Crear cliente", type="primary"):
                 if nombre:
@@ -273,7 +273,7 @@ elif pagina == "💼  Carteras":
                         st.caption("Sin perfil cargado.")
 
                     with st.popover("Actualizar perfil"):
-                        perfil_data = ui.form_perfil(perfil)
+                        perfil_data = ui.form_perfil(perfil, form_key=f"perfil_cart_{cartera_sel}")
                         if perfil_data:
                             db.guardar_perfil(cartera_sel, **{k: perfil_data[k] for k in ["horizonte","tolerancia","objetivo","liquidez","restricciones","fecha"]})
                             st.success("Perfil actualizado.")
@@ -323,7 +323,7 @@ elif pagina == "💼  Carteras":
                         moneda_pos = st.selectbox("Moneda", ["ARS","USD"])
                         cantidad_pos = st.number_input("Cantidad", min_value=0.0, step=1.0)
                         precio_compra = st.number_input("Precio de compra", min_value=0.0, step=0.01)
-                        fecha_compra = st.date_input("Fecha de compra", value=date.today())
+                        fecha_compra = st.date_input("Fecha de compra", value=date.today(), format="DD/MM/YYYY")
                     notas_pos = st.text_input("Notas (opcional)")
                     if st.form_submit_button("Agregar posición", type="primary"):
                         if ticker and cantidad_pos > 0:
@@ -396,7 +396,7 @@ elif pagina == "↕️  Movimientos":
                     ticker_mov = st.text_input("Ticker")
                     cantidad_mov = st.number_input("Cantidad", min_value=0.0, step=1.0)
                 with c2:
-                    fecha_mov = st.date_input("Fecha", value=date.today())
+                    fecha_mov = st.date_input("Fecha", value=date.today(), format="DD/MM/YYYY")
                     precio_mov = st.number_input("Precio unitario", min_value=0.0, step=0.01)
                     moneda_mov = st.selectbox("Moneda", ["ARS","USD"])
                 notas_mov = st.text_input("Notas")
