@@ -174,10 +174,10 @@ def ticker_header():
 
 # ---- PERFIL DE RIESGO ----
 
-def form_perfil(perfil_actual=None):
+def form_perfil(perfil_actual=None, form_key="form_perfil"):
     """Formulario de perfil de riesgo. Devuelve datos si se guarda."""
     p = perfil_actual or {}
-    with st.form("form_perfil"):
+    with st.form(form_key):
         st.markdown("**Cuestionario de perfil de riesgo**")
         horizonte = st.selectbox("Horizonte de inversión", [
             "Corto plazo (hasta 12 meses)",
@@ -200,7 +200,7 @@ def form_perfil(perfil_actual=None):
         restricciones = st.text_area("Restricciones / preferencias", value=p.get("restricciones", ""), height=80)
 
         import datetime
-        fecha = st.date_input("Fecha de actualización", value=datetime.date.today())
+        fecha = st.date_input("Fecha de actualización", value=datetime.date.today(), format="DD/MM/YYYY")
 
         submitted = st.form_submit_button("Guardar perfil", type="primary")
         if submitted:
