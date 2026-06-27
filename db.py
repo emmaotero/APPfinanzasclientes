@@ -38,6 +38,11 @@ def actualizar_cliente(cliente_id, datos):
     sb = get_client()
     sb.table("clientes").update(datos).eq("id", cliente_id).execute()
 
+def eliminar_cliente(cliente_id):
+    sb = get_client()
+    # Soft delete — marca como inactivo
+    sb.table("clientes").update({"activo": False}).eq("id", cliente_id).execute()
+
 # ---- CARTERAS ----
 
 def get_carteras(cliente_id=None):
@@ -60,6 +65,10 @@ def crear_cartera(cliente_id, nombre, moneda_base):
     }).execute()
     return r.data
 
+def eliminar_cartera(cartera_id):
+    sb = get_client()
+    sb.table("carteras").update({"activa": False}).eq("id", cartera_id).execute()
+
 # ---- PERFIL DE RIESGO ----
 
 def get_perfil(cartera_id):
@@ -70,15 +79,10 @@ def get_perfil(cartera_id):
 
 def guardar_perfil(cartera_id, horizonte, tolerancia, objetivo, liquidez, restricciones, fecha):
     sb = get_client()
-    # Buscar si ya existe
     existing = get_perfil(cartera_id)
     datos = {
-        "cartera_id": cartera_id,
-        "horizonte": horizonte,
-        "tolerancia": tolerancia,
-        "objetivo": objetivo,
-        "liquidez": liquidez,
-        "restricciones": restricciones,
+        "cartera_id": cartera_id, "horizonte": horizonte, "tolerancia": tolerancia,
+        "objetivo": objetivo, "liquidez": liquidez, "restricciones": restricciones,
         "fecha_actualizacion": str(fecha)
     }
     if existing:
@@ -98,12 +102,13 @@ def get_posiciones(cartera_id=None, solo_activas=True):
     r = q.execute()
     return pd.DataFrame(r.data) if r.data else pd.DataFrame()
 
-def crear_posicion(cartera_id, ticker, nombre, tipo, moneda, cantidad, precio_compra, fecha_compra, notas=""):
+def crear_posicion(cartera_id, ticker, nombre, tipo, moneda, cantidad, precio_compra, fecha_compra, precio_manual=None, notas=""):
     sb = get_client()
     r = sb.table("posiciones").insert({
         "cartera_id": cartera_id, "ticker": ticker, "nombre": nombre,
         "tipo": tipo, "moneda": moneda, "cantidad": cantidad,
-        "precio_compra": precio_compra, "fecha_compra": str(fecha_compra), "notas": notas
+        "precio_compra": precio_compra, "fecha_compra": str(fecha_compra),
+        "precio_manual": precio_manual, "notas": notas
     }).execute()
     return r.data
 
@@ -111,7 +116,7 @@ def actualizar_posicion(posicion_id, datos):
     sb = get_client()
     sb.table("posiciones").update(datos).eq("id", posicion_id).execute()
 
-def cerrar_posicion(posicion_id):
+def eliminar_posicion(posicion_id):
     sb = get_client()
     sb.table("posiciones").update({"activa": False}).eq("id", posicion_id).execute()
 
@@ -135,6 +140,10 @@ def registrar_movimiento(cartera_id, tipo, fecha, ticker, cantidad, precio, mone
     }).execute()
     return r.data
 
+def eliminar_movimiento(movimiento_id):
+    sb = get_client()
+    sb.table("movimientos").delete().eq("id", movimiento_id).execute()
+
 # ---- RADAR ----
 
 def get_radar():
@@ -148,7 +157,7 @@ def agregar_radar(ticker, agregado_por=""):
         sb.table("radar").insert({"ticker": ticker.upper(), "agregado_por": agregado_por}).execute()
         return True
     except Exception:
-        return False  # ya existe (unique constraint)
+        return False
 
 def eliminar_radar(ticker):
     sb = get_client()
