@@ -129,7 +129,7 @@ def get_inflacion(ultimos_n: int = 12) -> pd.DataFrame:
         if r.status_code == 200:
             data = r.json()
             df = pd.DataFrame(data).tail(ultimos_n)
-            df["fecha"] = pd.to_datetime(df["fecha"]).dt.strftime("%b %Y")
+            df["fecha"] = pd.to_datetime(df["fecha"]).dt.strftime("%m/%Y")
             return df
     except Exception:
         pass
